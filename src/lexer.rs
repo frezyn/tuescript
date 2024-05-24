@@ -1,7 +1,7 @@
 use std::{collections::HashMap, vec};
 
 
-use crate::token::{TokenType, Token};
+use crate::token::{Literal, Token, TokenType};
 
 #[derive(Debug)] // Add this line
 pub struct Lexer {
@@ -34,7 +34,7 @@ impl Lexer {
   pub fn scan_tokens(&mut self) {
     while !self.is_the_end() {
         self.start = self.current;
-        self.scan_tokens();
+        self.scan_token();
     }
     self.tokens.push(Token {
         token_type: TokenType::TERMINATE,
@@ -43,4 +43,33 @@ impl Lexer {
         line: self.line,
     });
 }
+
+    pub fn scan_token(&mut self) {
+      let c = self.advance();
+      match c {
+          '+' => self.add_token(TokenType::Plus),
+          _ => {
+            panic!("Caracter nao experado!")
+          }
+      }
+    }
+
+    pub fn advance(&mut self) -> char {
+      self.current += 1;
+      return self.source.chars().nth(self.current - 1).unwrap();
+    }
+
+    pub fn add_token(&mut self, token_type: TokenType) {
+      self.add_literal_token(token_type, None)
+    }
+
+    fn add_literal_token(&mut self, token_type: TokenType, literal: Option<Literal>) {
+      let lex = &self.source[self.start..self.current];
+      self.tokens.push(Token {
+        token_type,
+        literal,
+        lex: lex.to_string(),
+        line: self.line
+      })
+    }
 }

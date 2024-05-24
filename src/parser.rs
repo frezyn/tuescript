@@ -21,9 +21,12 @@ impl Parser{
     }
   }
 
-  pub fn parse(&mut self) -> Result<Vec<Statement>, String> {
-    let mut smts = vec![];
-  }
+  // pub fn parse(&mut self) -> Result<Vec<Statement>, String> {
+  //   let mut smts = vec![];
+  //   // while !self.end_of_line() {
+      
+  //   // }
+  // }
 
   fn end_of_line(&self) -> bool {
     return self.peek().token_type == TokenType::TERMINATE;

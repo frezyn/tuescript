@@ -1,16 +1,18 @@
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TokenType {
+  Plus,
   TERMINATE,
 }
 
 #[derive(Clone, Debug)]
 pub enum Literal {
+  // Identifier(String),
   Str(String),
-  Number(f32),
+  Number(f64),
   True,
   False,
-  Null
+  Nil,
 }
 #[derive(Clone, Debug)] // Add this line
 
@@ -20,3 +22,5 @@ pub struct Token {
   pub lex: String,
   pub line: usize,
 }
+
+
