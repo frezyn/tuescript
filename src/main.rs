@@ -2,9 +2,12 @@ use std::{fs, path::PathBuf};
 
 mod lexer;
 mod token;
+mod parser;
+mod statement;
 
 use clap::Parser;
 use lexer::Lexer;
+use parser::Parser as Par;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -30,4 +33,8 @@ fn read_file(path: PathBuf) {
 fn run(src: String) {
         let mut scann = Lexer::new(&src);
         scann.scan_tokens();
+
+        let mut parser = Par::new(scann.tokens);
+
+
 }
