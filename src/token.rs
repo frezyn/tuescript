@@ -12,6 +12,7 @@ pub enum Literal {
   False,
   Null
 }
+#[derive(Clone, Debug)] // Add this line
 
 pub struct Token {
   pub token_type: TokenType,

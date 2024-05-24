@@ -2,6 +2,8 @@ use std::{collections::HashMap, vec};
 
 
 use crate::token::{TokenType, Token};
+
+#[derive(Debug)] // Add this line
 pub struct Lexer {
   start: usize,
   current: usize,
