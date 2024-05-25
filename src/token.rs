@@ -2,10 +2,11 @@
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TokenType {
   Plus,
+  Number,
   TERMINATE,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub enum Literal {
   // Identifier(String),
   Str(String),
@@ -14,7 +15,7 @@ pub enum Literal {
   False,
   Nil,
 }
-#[derive(Clone, Debug)] // Add this line
+#[derive(Clone)] // Add this line
 
 pub struct Token {
   pub token_type: TokenType,

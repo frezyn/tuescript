@@ -2,8 +2,6 @@ use std::{fs, path::PathBuf};
 
 mod lexer;
 mod token;
-mod parser;
-mod statement;
 
 use clap::Parser;
 use lexer::Lexer;
@@ -32,7 +30,5 @@ fn read_file(path: PathBuf) {
 fn run(src: String) {
         let mut scann = Lexer::new(&src);
         scann.scan_tokens();
-        println!("{:?}", scann)
-
-
+               
 }

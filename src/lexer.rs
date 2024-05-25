@@ -1,9 +1,9 @@
+use core::panic;
 use std::{collections::HashMap, vec};
 
 
 use crate::token::{Literal, Token, TokenType};
 
-#[derive(Debug)] // Add this line
 pub struct Lexer {
   start: usize,
   current: usize,
@@ -49,7 +49,11 @@ impl Lexer {
       match c {
           '+' => self.add_token(TokenType::Plus),
           _ => {
-            panic!("Caracter nao experado!")
+            if c.is_digit(10) {
+              self.number()
+            } else {
+              panic!("caractere nao suportado!")
+            }
           }
       }
     }
@@ -72,4 +76,36 @@ impl Lexer {
         line: self.line
       })
     }
+
+    fn number(&mut self) {
+      while self.peek().is_digit(10) {
+        self.advance();
+      }
+      if self.peek() == '.' && self.peek_next().is_digit(10) {
+        self.advance();
+
+        while self.peek().is_digit(10) {
+            self.advance();
+        }
+    }
+
+    self.add_literal_token(TokenType::Number, Some(Literal::Number(
+      self.source[self.start..self.current].parse::<f64>().unwrap()
+    )))
+    }
+
+    pub fn peek(&self) -> char {
+      if self.is_the_end() {
+        return '\0'
+      }
+      return self.source.chars().nth(self.current).unwrap();
+    }
+
+    fn peek_next(&self) -> char {
+      if self.current + 1 >= self.source.len() {
+          return '\0';
+      }
+      return self.source.chars().nth(self.current + 1).unwrap();
+  }
+
 }
