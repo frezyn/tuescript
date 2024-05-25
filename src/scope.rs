@@ -1,6 +1,9 @@
 use::std::collections::HashMap;
 
-#[derive(Clone)]
+use crate::interpreter::Value;
+
+#[derive(Clone, Debug)]
+
 pub struct Scope {
   pub values: HashMap<String, Value>,
   pub enclosing: Option<Box<Scope>>
@@ -14,7 +17,9 @@ impl Scope {
     }
   }
 
-  
+  pub fn load(&mut self, load: HashMap<String, Value>) {
+    self.values.extend(load)
+  }
 
 }
 

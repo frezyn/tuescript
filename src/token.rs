@@ -13,9 +13,8 @@ pub enum Literal {
   Number(f64),
   True,
   False,
-  Nil,
+  Null,
 }
-#[derive(Clone)] // Add this line
 
 pub struct Token {
   pub token_type: TokenType,
