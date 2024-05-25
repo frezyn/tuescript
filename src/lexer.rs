@@ -3,12 +3,12 @@ use std::{collections::HashMap, vec};
 
 
 use crate::token::{Literal, Token, TokenType};
-
+#[derive(Debug)]
 pub struct Lexer {
+  source: String,
+  pub tokens: Vec<Token>,
   start: usize,
   current: usize,
-  pub tokens: Vec<Token>,
-  source: String,
   line: usize,
   keywords: HashMap<String, TokenType>,
 }

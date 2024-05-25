@@ -2,8 +2,9 @@ use std::{
   collections::HashMap,
   fmt::{Debug, Display},
 };
-use crate::scope::Scope;
+use crate::{scope::Scope, token::Literal};
 use crate::token::{Token, TokenType};
+use std::io::Write;
 
 #[derive(Clone, Debug)]
 pub struct Interpreter {
@@ -17,15 +18,31 @@ pub struct Interpreter {
 pub struct NativeFunction {
   pub name: String,
   pub arity: usize,
-  pub call: fn(&mut Interpreter, &[Value]) -> Result<Value, String>
+  pub callable: fn(&mut Interpreter, &[Value]) -> Result<Value, String>
 }
 
+#[derive(Clone,Hash, PartialEq, Eq, Debug)]
+pub struct Symbol {
+  pub name: String,
+  pub s_id: u64,
+}
+
+#[derive(Clone, Debug)]
 pub enum Expression {
   Binary(Box<Expression>, Token, Box<Expression>),
+  Grouping(Box<Expression>),
+  Literal(Literal),
+  Primary(Symbol),                               //Variable
+  Call(Box<Expression>, Token, Vec<Expression>), //Callee, args
 }
-
+#[derive(Debug)]
 pub enum Statement {
   Expression(Expression)
+}
+
+pub trait Callable {
+  fn arity(&self) -> usize;
+  fn call(&mut self, interpreter: &mut Interpreter, args: &[Value]) -> Result<Value, String>;
 }
 
 
@@ -33,7 +50,7 @@ pub enum Statement {
 pub enum Value {
   Number(f64),
   NativeFunction(NativeFunction),
-  Nill
+  Nill,
 }
 
 impl Interpreter {
@@ -42,14 +59,14 @@ impl Interpreter {
     mp.insert(
       "print".to_string(),
       Value::NativeFunction(NativeFunction {
-        name: "print".to_string(),
-        arity: 1,
-        call: |_, a| {
-          print!("{}", a[0].clone());
-          return Ok(Value::Nill)
-        }
-      })
-    );
+          name: "print".to_string(),
+          arity: 1,
+          callable: |_, args| {
+              print!("{}", args[0].clone());
+              return Ok(Value::Nill);
+          },
+      }),
+  );
 
     let scope = Scope::new(None);
     let mut global = Scope::new(None);
@@ -83,9 +100,63 @@ fn interp_statement(&mut self, stmt: Statement) -> Result<(), String> {
 
 pub fn interp_expression(&mut self, exp: Expression) -> Result<Value, String> {
   match exp {
+    Expression::Primary(v) => self.interp_variable(v),
+    Expression::Literal(a) => self.interp_literal(a),
+    Expression::Grouping(ex) => self.interp_expression(*ex),
     Expression::Binary(l, operation, r) => self.interp_binary(l, operation, r),
+    Expression::Call(call,t , args ) => self.inter_call(call, t, args)
   }
 }
+
+
+fn interp_variable(&self, v: Symbol) -> Result<Value, String> {
+
+     self.look_up(v)
+ }
+pub fn interp_literal(&self, expr: Literal) -> Result<Value, String> {
+  match expr {
+      Literal::Number(n) => return Ok(Value::Number(n)),
+  }
+}
+
+fn inter_call(
+  &mut self,
+  call: Box<Expression>,
+  t: Token,
+  args: Vec<Expression>
+) -> Result<Value, String> {
+  let arguments: Vec<Value> = args.iter().map(|a| {
+    self.interp_expression(a.clone()).expect("Error ao interpretar argumentos de chamada")
+  }).collect();
+  self.call(call, t, arguments)
+}
+
+  fn call(
+    &mut self,
+    callee_expr: Box<Expression>,
+    loc: Token,
+    arg: Vec<Value>
+  ) -> Result<Value, String> {
+    let calle = self.interp_expression(*callee_expr)?;
+    let fval: Value;
+    match match_call(self, calle) {
+      Some(mut f) => {
+        if arg.len() != f.arity() {
+          panic!("exesso de arumentos fornecidos!");
+        } else {
+          fval = f.call(self, &arg)?;
+        }
+      }
+      None => todo!()
+    }
+    let return_val = self.return_val.clone();
+    self.return_val = None;
+    match return_val {
+        Some(val) => Ok(val.clone()),
+        None => Ok(fval)
+    }
+  }
+
 
 fn interp_binary(
   &mut self,
@@ -102,6 +173,22 @@ fn interp_binary(
   }
 }
 
+  pub fn look_up(&self, sym: Symbol) -> Result<Value, String> {
+    let distance = self.lex_scope.get(&sym.s_id);
+    if let Some(d) = distance {
+      return Ok(self.program_scope.get_at(sym, *d))
+    }else {
+      return Ok(self.global.get_at(sym, 0))
+    }
+  }
+
+}
+
+fn match_call(interpreter: &mut Interpreter, val: Value) -> Option<Box<dyn Callable>> {
+  match val {
+    Value::NativeFunction(f) => Some(Box::new(f)),
+    _ => panic!("Erro ao chamar função")
+  }
 }
 
 impl Display for Value {
@@ -111,5 +198,15 @@ impl Display for Value {
           Value::Nill => f.write_str("Nil"),
           Value::NativeFunction(_) => f.write_str("Native Function"),
       }
+  }
+}
+
+impl Callable for NativeFunction {
+  fn arity(&self) -> usize {
+      self.arity
+  }
+
+  fn call(&mut self, interpreter: &mut Interpreter, args: &[Value]) -> Result<Value, String> {
+      return (self.callable)(interpreter, args);
   }
 }

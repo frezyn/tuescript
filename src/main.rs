@@ -43,8 +43,8 @@ fn run(src: String) {
         let mut p = parse::new(scann.tokens);
         let smts = p.parse().expect("erro ao parsear estrutura sintatica");
         let mut interpreter = Interpreter::new(HashMap::new()); 
-        print!("{:?}", interpreter);
-        interpreter.inter(smts);
-
-
+        interpreter.inter(smts)
+        // lexer: tokens: [Token Identifier, Token LeftParen, Token Number(Number(2.0)), Token Plus, Token Number(Number(2.0)), Token RightParen, Token TERMINATE], start: 11, current: 12, line: 1, keywords: {"super": Super, "this": This, "or": Or, "let": Let, "nil": Nil, "else": Else, "while": While, "for": For, "return": Return, "struct": Struct, "false": False, "fun": Fun, "class": Class, "break": Break, "continue": Continue, "true": True, "and": And, "loop": Loop, "if": If} } 
+        // Parser { tokens: [Token Identifier, Token LeftParen, Token Number(Number(2.0)), Token Plus, Token Number(Number(2.0)), Token RightParen, Token TERMINATE], current: 0, inloop: false, function_stack: [], s_id: 0 }
+        // [Expression(Call(Primary(Symbol { name: "println" }), Token RightParen, [Binary(Literal(Number(2.0)), Token Plus, Literal(Number(2.0)))]))]
 }
