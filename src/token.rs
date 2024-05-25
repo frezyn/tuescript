@@ -2,18 +2,18 @@
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TokenType {
   Plus,
+  LeftParen,
+  RightParen,
   Number,
+  Identifier,
+
   TERMINATE,
 }
 
 #[derive(Clone)]
 pub enum Literal {
   // Identifier(String),
-  Str(String),
-  Number(f64),
-  True,
-  False,
-  Null,
+  Number(f64)
 }
 
 pub struct Token {

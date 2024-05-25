@@ -41,9 +41,10 @@ fn run(src: String) {
         let mut scann = Lexer::new(&src);
         scann.scan_tokens();
         let mut p = parse::new(scann.tokens);
-        let mut smts = p.parse().expect("erro ao parsear estrutura sintatica");
+        let smts = p.parse().expect("erro ao parsear estrutura sintatica");
         let mut interpreter = Interpreter::new(HashMap::new()); 
-        print!("{:?}", interpreter)
+        print!("{:?}", interpreter);
+        interpreter.inter(smts);
 
 
 }

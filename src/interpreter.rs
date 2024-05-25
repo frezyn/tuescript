@@ -1,5 +1,7 @@
-use std::collections::HashMap;
-
+use std::{
+  collections::HashMap,
+  fmt::{Debug, Display},
+};
 use crate::scope::Scope;
 use crate::token::{Token, TokenType};
 
@@ -31,7 +33,7 @@ pub enum Statement {
 pub enum Value {
   Number(f64),
   NativeFunction(NativeFunction),
-  Null
+  Nill
 }
 
 impl Interpreter {
@@ -43,8 +45,8 @@ impl Interpreter {
         name: "print".to_string(),
         arity: 1,
         call: |_, a| {
-          print!("{:?}", a[0].clone());
-          return Ok(Value::Null)
+          print!("{}", a[0].clone());
+          return Ok(Value::Nill)
         }
       })
     );
@@ -61,25 +63,53 @@ impl Interpreter {
     }
   }
   
-//   pub fn inter(&mut self, smts: Vec<Statement>) {
-//     for s in smts {
-//       match self. {
-          
-//       }
-//   }
-// }
+  pub fn inter(&mut self, smts: Vec<Statement>) {
+    for s in smts {
+      match self.interp_statement(s){
+          Ok(_) => (),
+          Err(e) => panic!("{}", e)
+      }
+  }
+}
 
-// pub fn inter_statment(&mut self, stms: Statement) -> Result<(), String> {
-// //   match stms {
-// //       // Statement::Expression(ex) => {
-// //       //   // let _ =  self.inter_expression(ex).unwrap();
-// //       //   // Ok(())
-// //       // }
-// //   }
-// // }
-// }
+fn interp_statement(&mut self, stmt: Statement) -> Result<(), String> {
+  match stmt {
+    Statement::Expression(exp) => {
+      let _ = self.interp_expression(exp)?;
+      Ok(())
+    }
+  }
+}
 
+pub fn interp_expression(&mut self, exp: Expression) -> Result<Value, String> {
+  match exp {
+    Expression::Binary(l, operation, r) => self.interp_binary(l, operation, r),
+  }
+}
 
+fn interp_binary(
+  &mut self,
+  l: Box<Expression>,
+  o: Token,
+  r: Box<Expression>
+) -> Result<Value, String> {
+  let left = self.interp_expression(*l).expect("valor esquerdo invalido");
+  let right = self.interp_expression(*r).expect("valor a direira invalido");
+
+  match (left, o.token_type, right) {
+    (Value::Number(l), TokenType::Plus, Value::Number(r)) => Ok(Value::Number(l + r)),
+    (_, _, _) => panic!("Operação binaria invalida")
+  }
+}
 
 }
 
+impl Display for Value {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+      match self {
+          Value::Number(n) => f.write_fmt(format_args!("{}", n)),
+          Value::Nill => f.write_str("Nil"),
+          Value::NativeFunction(_) => f.write_str("Native Function"),
+      }
+  }
+}

@@ -47,14 +47,33 @@ impl Lexer {
     pub fn scan_token(&mut self) {
       let c = self.advance();
       match c {
+          '(' => self.add_token(TokenType::LeftParen),
+          ')' => self.add_token(TokenType::RightParen),
           '+' => self.add_token(TokenType::Plus),
+          '\n' => self.line += 1,
           _ => {
             if c.is_digit(10) {
               self.number()
-            } else {
-              panic!("caractere nao suportado!")
+            } else if c.is_alphabetic() || c == '_' {
+              self.indentifier();
+            }
+            else {
+              panic!("caractere nao suportado! {} line {}", c, self.line)
             }
           }
+      }
+    }
+
+    fn indentifier(&mut self) {
+      while self.peek().is_alphabetic() || self.peek() == '_' {
+        self.advance();
+      }
+      let a = &self.source[self.start..self.current];
+      let t = self.keywords.get(a);
+      if let Some(istype) = t {
+        self.add_token(*istype);
+      }else {
+        self.add_token(TokenType::Identifier)
       }
     }
 

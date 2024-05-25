@@ -1,4 +1,4 @@
-use crate::token::Token;
+use crate::{interpreter::Statement, token::Token};
 
 
 
@@ -20,7 +20,7 @@ impl Parser {
     }
   }
 
-  pub fn parse(&mut self) -> Result<Vec<String>, String> {
+  pub fn parse(&mut self) -> Result<Vec<Statement>, String> {
     let smts = vec![];
     return Ok(smts)
   }
