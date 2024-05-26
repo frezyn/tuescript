@@ -10,4 +10,4 @@ para executar, basta rodar
 cargo run teste.tue
 ``` 
 
-aliais, pq tue? ah, sei la... quando tive a ideia de escrever um interpreter, tava tocando matue, entao e isso.
+aliais, pq o nome "tue"? ah, sei la... quando tive a ideia de escrever um interpreter, tava tocando matue, entao e isso.
