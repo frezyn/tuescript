@@ -51,6 +51,7 @@ impl Lexer {
           ')' => self.add_token(TokenType::RightParen),
           '+' => self.add_token(TokenType::Plus),
           '\n' => self.line += 1,
+          '"' => self.string(),
           _ => {
             if c.is_digit(10) {
               self.number()
@@ -58,7 +59,7 @@ impl Lexer {
               self.indentifier();
             }
             else {
-              panic!("caractere nao suportado! {} line {}", c, self.line)
+              panic!("caractere nao suportado! caractere: ({}) na linha: {}", c, self.line)
             }
           }
       }
@@ -82,6 +83,20 @@ impl Lexer {
       return self.source.chars().nth(self.current - 1).unwrap();
     }
 
+    fn string(&mut self) {
+      while self.peek() != '"' && !self.is_the_end() {
+        if self.peek() == '\n' {
+          self.line += 1
+        };
+        self.advance();
+      }
+      if self.is_the_end() {
+        return;
+    }
+    self.advance();
+    let value: String = self.source[self.start + 1..self.current -1].to_string();
+    self.add_literal_token(TokenType::String, Some(Literal::Str(value)))
+  }
     pub fn add_token(&mut self, token_type: TokenType) {
       self.add_literal_token(token_type, None)
     }

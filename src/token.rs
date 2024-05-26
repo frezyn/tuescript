@@ -1,5 +1,4 @@
 use core::fmt;
-use std::fmt::write;
 
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -17,7 +16,7 @@ pub enum TokenType {
 
 #[derive(Clone, Debug)]
 pub enum Literal {
-  // Identifier(String),
+  Str(String),
   Number(f64)
 }
 

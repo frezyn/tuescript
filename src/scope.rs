@@ -25,7 +25,7 @@ impl Scope {
     if let Some(val) = self.ancestor(d).values.get(&sym.name){
       return val.clone();
     } else {
-      panic!("erro aso pegar valor em lex scope!")
+      panic!("erro aso pegar valor no escopo lexico!")
     }
   }
 
@@ -35,11 +35,10 @@ impl Scope {
         if let Some(e) = ret.enclosing.clone(){
         ret = (*e).clone();
         }else{
-            panic!("Enclosing scope not found");
+            panic!("Delimitador do escopo nao encontrado!");
         }
     }
     return ret.clone();
 }
-
 }
 

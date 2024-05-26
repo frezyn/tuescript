@@ -4,7 +4,6 @@ use std::{
 };
 use crate::{scope::Scope, token::Literal};
 use crate::token::{Token, TokenType};
-use std::io::Write;
 
 #[derive(Clone, Debug)]
 pub struct Interpreter {
@@ -32,8 +31,8 @@ pub enum Expression {
   Binary(Box<Expression>, Token, Box<Expression>),
   Grouping(Box<Expression>),
   Literal(Literal),
-  Primary(Symbol),                               //Variable
-  Call(Box<Expression>, Token, Vec<Expression>), //Callee, args
+  Primary(Symbol),                               
+  Call(Box<Expression>, Token, Vec<Expression>), 
 }
 #[derive(Debug)]
 pub enum Statement {
@@ -49,6 +48,7 @@ pub trait Callable {
 #[derive(Clone, Debug)]
 pub enum Value {
   Number(f64),
+  String(String),
   NativeFunction(NativeFunction),
   Nill,
 }
@@ -57,12 +57,12 @@ impl Interpreter {
   pub fn new(lex_scope: HashMap<u64, usize>) -> Interpreter {
     let mut mp: HashMap<String, Value> = HashMap::new();
     mp.insert(
-      "print".to_string(),
+      "println".to_string(),
       Value::NativeFunction(NativeFunction {
-          name: "print".to_string(),
+          name: "println".to_string(),
           arity: 1,
           callable: |_, args| {
-              print!("{}", args[0].clone());
+              println!("{}", args[0].clone());
               return Ok(Value::Nill);
           },
       }),
@@ -74,9 +74,9 @@ impl Interpreter {
 
     Interpreter {
       program_scope: scope,
-      global: global,
+      global,
       return_val: None,
-      lex_scope: lex_scope,
+      lex_scope,
     }
   }
   
@@ -115,6 +115,7 @@ fn interp_variable(&self, v: Symbol) -> Result<Value, String> {
  }
 pub fn interp_literal(&self, expr: Literal) -> Result<Value, String> {
   match expr {
+      Literal::Str(s) => return Ok(Value::String(s)),
       Literal::Number(n) => return Ok(Value::Number(n)),
   }
 }
@@ -139,7 +140,7 @@ fn inter_call(
   ) -> Result<Value, String> {
     let calle = self.interp_expression(*callee_expr)?;
     let fval: Value;
-    match match_call(self, calle) {
+    match match_call(calle) {
       Some(mut f) => {
         if arg.len() != f.arity() {
           panic!("exesso de arumentos fornecidos!");
@@ -184,7 +185,7 @@ fn interp_binary(
 
 }
 
-fn match_call(interpreter: &mut Interpreter, val: Value) -> Option<Box<dyn Callable>> {
+fn match_call(val: Value) -> Option<Box<dyn Callable>> {
   match val {
     Value::NativeFunction(f) => Some(Box::new(f)),
     _ => panic!("Erro ao chamar função")
@@ -194,9 +195,10 @@ fn match_call(interpreter: &mut Interpreter, val: Value) -> Option<Box<dyn Calla
 impl Display for Value {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
       match self {
+          Value::String(s) => f.write_fmt(format_args!("{}", s)),
           Value::Number(n) => f.write_fmt(format_args!("{}", n)),
-          Value::Nill => f.write_str("Nil"),
-          Value::NativeFunction(_) => f.write_str("Native Function"),
+          Value::Nill => f.write_str("nill"),
+          Value::NativeFunction(_) => f.write_str("Native function"),
       }
   }
 }
