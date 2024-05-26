@@ -51,6 +51,7 @@ impl Lexer {
           ')' => self.add_token(TokenType::RightParen),
           '+' => self.add_token(TokenType::Plus),
           '\n' => self.line += 1,
+          ' ' | '\r' | '\t' => {},
           '"' => self.string(),
           _ => {
             if c.is_digit(10) {
