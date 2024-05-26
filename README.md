@@ -4,3 +4,10 @@ um simples interprete escrito em rust, atualmente em construção. mas ja tem op
 println("joao e bonitao")
 println(2+2)  
 ```
+
+para executar, basta rodar 
+```
+cargo run teste.tue
+``` 
+
+aliais, pq tue? ah, sei la... quando tive a ideia de escrever um interpreter, tava tocando matue, entao e isso.
