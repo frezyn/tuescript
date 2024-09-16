@@ -170,6 +170,17 @@ fn interp_binary(
 
   match (left, o.token_type, right) {
     (Value::Number(l), TokenType::Plus, Value::Number(r)) => Ok(Value::Number(l + r)),
+    (Value::String(l), TokenType::Plus, Value::String(r))  => Ok(Value::String(l.as_str().to_string() + r.as_str())),  
+    (Value::String(l), TokenType::Plus, Value::Number(r))  => {
+      let l_parsed = l.parse::<f64>().map_err(|_| "erro ao parsear valor do tipo esquero")?;
+
+      Ok(Value::Number(l_parsed + r))
+    },
+    (Value::Number(l), TokenType::Plus, Value::String(r))  => {
+      let r_parsed = r.parse::<f64>().map_err(|_| "erro ao parsear valor do tipo esquero")?;
+
+      Ok(Value::Number(l + r_parsed))
+    },
     (_, _, _) => panic!("Operação binaria invalida")
   }
 }

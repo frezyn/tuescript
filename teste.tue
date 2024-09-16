@@ -1,2 +1,4 @@
-println("Joao e lindo")
-println(2 + 2)
+println("Joao e lindo") 
+println("Joao" + "lindo")
+println("5" + 2) 
+println(4 + "2") 
